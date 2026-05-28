@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { authApi } from "../api/auth/auth.api";
 import type { LoginRequest } from "../api/auth/auth.types";
 import { useAuth } from "../hooks/use-auth";
-import { authApi } from "../api/auth/auth.api";
 
 export const Route = createFileRoute("/login")({
     component: LoginComponent,
@@ -21,9 +21,7 @@ type FormData = z.infer<typeof schema>;
 
 function LoginComponent() {
     const { loadUser } = useAuth();
-
     const navigate = Route.useNavigate();
-    const router = useRouter();
 
     const {
         handleSubmit,
@@ -41,8 +39,6 @@ function LoginComponent() {
 
         await authApi.postLogin(dto);
         await loadUser();
-
-        await router.invalidate();
         await navigate({ to: "/" });
     });
 

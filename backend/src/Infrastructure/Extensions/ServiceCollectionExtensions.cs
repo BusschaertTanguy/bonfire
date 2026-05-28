@@ -1,4 +1,5 @@
-﻿using Infrastructure.Data;
+﻿using Application.Data;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,9 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<ApplicationDbContext>(builder =>
             builder.UseNpgsql(connectionString)
                 .UseSnakeCaseNamingConvention());
+
+        services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
+        services.AddTransient<IUniqueConstraintDetector, PostgresUniqueConstraintDetector>();
 
         return services;
     }

@@ -1,3 +1,4 @@
+using Application.Extensions;
 using Infrastructure.Data;
 using Infrastructure.Extensions;
 using Infrastructure.Identity;
@@ -8,9 +9,12 @@ using Presentation.Routes;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddInfrastructureLayer(builder.Configuration);
+builder.Services
+    .AddApplicationLayer()
+    .AddInfrastructureLayer(builder.Configuration);
 
 builder.Services.AddProblemDetails();
+builder.Services.AddValidation();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
@@ -91,6 +95,7 @@ var api = app.MapGroup("api")
 var v1 = api.MapGroup("v1");
 
 v1.MapAuthRoutes();
+v1.MapSessionRoutes();
 
 if (app.Environment.IsDevelopment())
 {

@@ -23,7 +23,6 @@ function IndexComponent() {
             )}
             {!!user && (
                 <>
-                    <button className="cursor-pointer">Create session</button>
                     <Link to="/session">My sessions</Link>
                 </>
             )}

@@ -5,11 +5,15 @@ declare module "@tanstack/react-router" {
     interface Register {
         router: typeof router;
     }
+
+    interface StaticDataRouteOption {
+        breadcrumb?: string | ((loaderData: unknown) => string);
+    }
 }
 
 export const router = createRouter({
     routeTree,
     context: {
-        auth: undefined,
+        authenticated: false,
     },
 });

@@ -20,6 +20,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 function RegisterComponent() {
+    const navigate = Route.useNavigate();
+
     const {
         handleSubmit,
         register,
@@ -27,7 +29,6 @@ function RegisterComponent() {
     } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
-    const navigate = Route.useNavigate();
 
     const handleRegister = handleSubmit(async (data: FormData) => {
         const dto: RegisterRequest = {
