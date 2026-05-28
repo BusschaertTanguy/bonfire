@@ -5,7 +5,7 @@ import type { SessionDto } from "../../../api/sessions/sessions.types";
 export const Route = createFileRoute("/_authenticated/session/$id")({
     component: RouteComponent,
     loader: async ({ params }) => {
-        const response = await sessionsApi.getDetail(params.id);
+        const response = await sessionsApi.get(params.id);
         return response.data;
     },
     staticData: {

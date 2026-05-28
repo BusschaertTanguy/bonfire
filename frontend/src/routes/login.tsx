@@ -37,7 +37,7 @@ function LoginComponent() {
             password: data.password,
         };
 
-        await authApi.postLogin(dto);
+        await authApi.login(dto);
         await loadUser();
         await navigate({ to: "/" });
     });

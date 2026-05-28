@@ -39,7 +39,7 @@ function RootComponent() {
     );
 
     const handleLogout = async () => {
-        await authApi.postLogout();
+        await authApi.logout();
         clearUser();
         await navigate({ to: "/" });
     };

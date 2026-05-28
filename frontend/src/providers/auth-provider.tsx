@@ -18,7 +18,7 @@ export const AuthProvider = (props: PropsWithChildren) => {
 
     const loadUser = useCallback(async () => {
         try {
-            const userResponse = await authApi.getMe();
+            const userResponse = await authApi.me();
             setUser(userResponse.data);
         } catch {
             setUser(null);

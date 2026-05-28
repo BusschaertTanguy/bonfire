@@ -34,7 +34,7 @@ function RouteComponent() {
             name: data.name,
         };
 
-        const result = await sessionsApi.postCreate(dto);
+        const result = await sessionsApi.create(dto);
         await navigate({ to: `/session/${result.data}` });
     });
 

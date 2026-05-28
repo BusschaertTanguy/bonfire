@@ -6,7 +6,7 @@ import "./index.css";
 import { AuthProvider } from "./providers/auth-provider.tsx";
 
 async function bootstrap() {
-    await authApi.getAntiforgeryToken();
+    await authApi.antiforgery();
 
     const rootElement = document.getElementById("root");
 

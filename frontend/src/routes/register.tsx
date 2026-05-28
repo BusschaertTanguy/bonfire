@@ -37,7 +37,7 @@ function RegisterComponent() {
             userName: data.userName,
         };
 
-        await authApi.postRegister(dto);
+        await authApi.register(dto);
         await navigate({ to: "/login" });
     });
 

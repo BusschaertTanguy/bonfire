@@ -3,32 +3,32 @@ import type { LoginRequest, RegisterRequest, User } from "./auth.types";
 
 const url = "/api/v1/auth";
 
-const getMe = async () => {
+const me = async () => {
     return await apiClient.get<User>(`${url}/me`);
 };
 
-const postRegister = async (dto: RegisterRequest) => {
+const register = async (dto: RegisterRequest) => {
     return await apiClient.post(`${url}/register`, dto);
 };
 
-const postLogin = async (dto: LoginRequest) => {
+const login = async (dto: LoginRequest) => {
     await apiClient.post(`${url}/login`, dto);
-    await getAntiforgeryToken();
+    await antiforgery();
 };
 
-const postLogout = async () => {
+const logout = async () => {
     await apiClient.post(`${url}/logout`);
-    await getAntiforgeryToken();
+    await antiforgery();
 };
 
-const getAntiforgeryToken = async () => {
+const antiforgery = async () => {
     await apiClient.get(`${url}/antiforgery`);
 };
 
 export const authApi = {
-    getMe,
-    postRegister,
-    postLogin,
-    postLogout,
-    getAntiforgeryToken,
+    me,
+    register,
+    login,
+    logout,
+    antiforgery,
 };
