@@ -1,13 +1,15 @@
+import { authApi } from "@/api/auth/auth.api";
+import Button from "@/components/ui/button";
+import NavLink from "@/components/ui/nav-link";
+import { useAuth } from "@/hooks/use-auth";
 import {
     createRootRouteWithContext,
-    Link,
     Outlet,
     useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { ChevronRight } from "lucide-react";
 import { useMemo } from "react";
-import { authApi } from "../api/auth/auth.api";
-import { useAuth } from "../hooks/use-auth";
 
 export interface MyRouterContext {
     readonly authenticated: boolean;
@@ -48,28 +50,33 @@ function RootComponent() {
         <>
             <div className="flex h-dvh w-full flex-col divide-y">
                 <header className="flex items-center justify-between p-3">
-                    <Link to="/">Bonfire</Link>
+                    <NavLink to="/" variant="ghost">
+                        Bonfire
+                    </NavLink>
                     {!!user && (
                         <div className="flex items-center gap-4">
                             <span>{user.name}</span>
-                            <button
-                                onClick={handleLogout}
-                                className="cursor-pointer rounded border px-4 py-1"
-                            >
+                            <Button onClick={handleLogout} variant="outline">
                                 Logout
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </header>
                 <main className="flex h-full w-full flex-col gap-4 p-4">
-                    <nav className="flex gap-1">
+                    <nav className="flex items-center gap-2">
                         {crumbs.map((crumb, i) => (
                             <span
                                 key={crumb.path}
-                                className="flex items-center gap-1"
+                                className="flex items-center gap-2"
                             >
-                                <Link to={crumb.path}>{crumb.label}</Link>
-                                {i < crumbs.length - 1 && <span>/</span>}
+                                <span key={crumb.path}>
+                                    <NavLink to={crumb.path} size="sm">
+                                        {crumb.label}
+                                    </NavLink>
+                                </span>
+                                {i < crumbs.length - 1 && (
+                                    <ChevronRight className="size-3.5" />
+                                )}
                             </span>
                         ))}
                     </nav>

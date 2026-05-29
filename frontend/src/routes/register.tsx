@@ -1,9 +1,18 @@
+import { authApi } from "@/api/auth/auth.api";
+import type { RegisterRequest } from "@/api/auth/auth.types";
+import Button from "@/components/ui/button";
+import {
+    Field,
+    FieldControl,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field";
+import Form from "@/components/ui/form";
+import NavLink from "@/components/ui/nav-link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { createFileRoute } from "@tanstack/react-router";
+import { Controller, useForm } from "react-hook-form";
 import z from "zod";
-import { authApi } from "../api/auth/auth.api";
-import type { RegisterRequest } from "../api/auth/auth.types";
-import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/register")({
     component: RegisterComponent,
@@ -24,10 +33,15 @@ function RegisterComponent() {
 
     const {
         handleSubmit,
-        register,
-        formState: { errors, isSubmitting },
+        control,
+        formState: { isSubmitting },
     } = useForm<FormData>({
         resolver: zodResolver(schema),
+        defaultValues: {
+            userName: "",
+            email: "",
+            password: "",
+        },
     });
 
     const handleRegister = handleSubmit(async (data: FormData) => {
@@ -44,62 +58,100 @@ function RegisterComponent() {
     return (
         <section className="flex h-full w-full flex-col items-center justify-center gap-4">
             <h1>Register</h1>
-            <form onSubmit={handleRegister} className="flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="userName">User name</label>
-                    <input
-                        {...register("userName")}
-                        id="userName"
-                        type="text"
-                        className="rounded border p-1"
-                    />
-                </div>
-                {errors.userName && (
-                    <p className="text-sm text-red-500">
-                        {errors.userName.message}
-                    </p>
-                )}
-                <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        {...register("email")}
-                        id="email"
-                        type="email"
-                        className="rounded border p-1"
-                    />
-                </div>
-                {errors.email && (
-                    <p className="text-sm text-red-500">
-                        {errors.email.message}
-                    </p>
-                )}
-                <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        {...register("password")}
-                        id="password"
-                        type="password"
-                        className="rounded border p-1"
-                    />
-                </div>
-                {errors.password && (
-                    <p className="text-sm text-red-500">
-                        {errors.password.message}
-                    </p>
-                )}
-                <div className="flex flex-col items-center justify-center gap-2">
-                    <button
-                        type="submit"
-                        className="cursor-pointer rounded border px-4 py-1"
-                        disabled={isSubmitting}
-                    >
+            <Form onSubmit={handleRegister}>
+                <Controller
+                    control={control}
+                    name="userName"
+                    render={({
+                        field: { ref, name, value, onBlur, onChange },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                    }) => (
+                        <Field
+                            name={name}
+                            invalid={invalid}
+                            touched={isTouched}
+                            dirty={isDirty}
+                        >
+                            <FieldLabel>User name</FieldLabel>
+                            <FieldControl
+                                ref={ref}
+                                value={value}
+                                onBlur={onBlur}
+                                onValueChange={onChange}
+                                type="text"
+                                placeholder="User name"
+                            />
+                            <FieldError match={!!error}>
+                                {error?.message}
+                            </FieldError>
+                        </Field>
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="email"
+                    render={({
+                        field: { ref, name, value, onBlur, onChange },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                    }) => (
+                        <Field
+                            name={name}
+                            invalid={invalid}
+                            touched={isTouched}
+                            dirty={isDirty}
+                        >
+                            <FieldLabel>Email</FieldLabel>
+                            <FieldControl
+                                ref={ref}
+                                value={value}
+                                onBlur={onBlur}
+                                onValueChange={onChange}
+                                type="email"
+                                placeholder="Email"
+                            />
+                            <FieldError match={!!error}>
+                                {error?.message}
+                            </FieldError>
+                        </Field>
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="password"
+                    render={({
+                        field: { ref, name, value, onBlur, onChange },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                    }) => (
+                        <Field
+                            name={name}
+                            invalid={invalid}
+                            touched={isTouched}
+                            dirty={isDirty}
+                        >
+                            <FieldLabel>Password</FieldLabel>
+                            <FieldControl
+                                ref={ref}
+                                value={value}
+                                onBlur={onBlur}
+                                onValueChange={onChange}
+                                type="password"
+                                placeholder="Password"
+                            />
+                            <FieldError match={!!error}>
+                                {error?.message}
+                            </FieldError>
+                        </Field>
+                    )}
+                />
+                <div className="mt-4 flex flex-col justify-center gap-2">
+                    <Button type="submit" loading={isSubmitting}>
                         Register
-                    </button>
-                    <Link to="/" className="cursor-pointer text-sm">
+                    </Button>
+                    <NavLink to="/" size="sm">
                         Cancel
-                    </Link>
+                    </NavLink>
                 </div>
-            </form>
+            </Form>
         </section>
     );
 }

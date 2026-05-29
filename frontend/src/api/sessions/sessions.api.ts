@@ -1,4 +1,4 @@
-import apiClient from "../api-client";
+import apiClient from "@/api/api-client";
 import type { CreateSessionDto, SessionDto } from "./sessions.types";
 
 const url = "/api/v1/sessions";

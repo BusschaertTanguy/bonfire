@@ -1,10 +1,19 @@
+import { authApi } from "@/api/auth/auth.api";
+import type { LoginRequest } from "@/api/auth/auth.types";
+import Button from "@/components/ui/button";
+import {
+    Field,
+    FieldControl,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field";
+import Form from "@/components/ui/form";
+import NavLink from "@/components/ui/nav-link";
+import { useAuth } from "@/hooks/use-auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
+import { createFileRoute } from "@tanstack/react-router";
+import { Controller, useForm } from "react-hook-form";
 import z from "zod";
-import { authApi } from "../api/auth/auth.api";
-import type { LoginRequest } from "../api/auth/auth.types";
-import { useAuth } from "../hooks/use-auth";
 
 export const Route = createFileRoute("/login")({
     component: LoginComponent,
@@ -25,10 +34,14 @@ function LoginComponent() {
 
     const {
         handleSubmit,
-        register,
-        formState: { errors, isSubmitting },
+        control,
+        formState: { isSubmitting },
     } = useForm<FormData>({
         resolver: zodResolver(schema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
     });
 
     const handleLogin = handleSubmit(async (data: FormData) => {
@@ -45,48 +58,72 @@ function LoginComponent() {
     return (
         <section className="flex h-full w-full flex-col items-center justify-center gap-4">
             <h1>Login</h1>
-            <form onSubmit={handleLogin} className="flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        {...register("email")}
-                        id="email"
-                        type="email"
-                        className="rounded border p-1"
-                    />
-                </div>
-                {errors.email && (
-                    <p className="text-sm text-red-500">
-                        {errors.email.message}
-                    </p>
-                )}
-                <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        {...register("password")}
-                        id="password"
-                        type="password"
-                        className="rounded border p-1"
-                    />
-                </div>
-                {errors.password && (
-                    <p className="text-sm text-red-500">
-                        {errors.password.message}
-                    </p>
-                )}
-                <div className="flex flex-col items-center justify-center gap-2">
-                    <button
-                        type="submit"
-                        className="cursor-pointer rounded border px-4 py-1"
-                        disabled={isSubmitting}
-                    >
+            <Form onSubmit={handleLogin}>
+                <Controller
+                    control={control}
+                    name="email"
+                    render={({
+                        field: { ref, name, value, onBlur, onChange },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                    }) => (
+                        <Field
+                            name={name}
+                            invalid={invalid}
+                            touched={isTouched}
+                            dirty={isDirty}
+                        >
+                            <FieldLabel>Email</FieldLabel>
+                            <FieldControl
+                                ref={ref}
+                                value={value}
+                                onBlur={onBlur}
+                                onValueChange={onChange}
+                                type="email"
+                                placeholder="Email"
+                            />
+                            <FieldError match={!!error}>
+                                {error?.message}
+                            </FieldError>
+                        </Field>
+                    )}
+                />
+                <Controller
+                    control={control}
+                    name="password"
+                    render={({
+                        field: { ref, name, value, onBlur, onChange },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                    }) => (
+                        <Field
+                            name={name}
+                            invalid={invalid}
+                            touched={isTouched}
+                            dirty={isDirty}
+                        >
+                            <FieldLabel>Password</FieldLabel>
+                            <FieldControl
+                                ref={ref}
+                                value={value}
+                                onBlur={onBlur}
+                                onValueChange={onChange}
+                                type="password"
+                                placeholder="Password"
+                            />
+                            <FieldError match={!!error}>
+                                {error?.message}
+                            </FieldError>
+                        </Field>
+                    )}
+                />
+                <div className="mt-4 flex flex-col justify-center gap-2">
+                    <Button type="submit" loading={isSubmitting}>
                         Login
-                    </button>
-                    <Link to="/" className="cursor-pointer text-sm">
+                    </Button>
+                    <NavLink to="/" size="sm">
                         Cancel
-                    </Link>
+                    </NavLink>
                 </div>
-            </form>
+            </Form>
         </section>
     );
 }

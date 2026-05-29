@@ -1,9 +1,18 @@
+import { sessionsApi } from "@/api/sessions/sessions.api";
+import type { CreateSessionDto } from "@/api/sessions/sessions.types";
+import Button from "@/components/ui/button";
+import {
+    Field,
+    FieldControl,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field";
+import Form from "@/components/ui/form";
+import NavLink from "@/components/ui/nav-link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
+import { createFileRoute } from "@tanstack/react-router";
+import { Controller, useForm } from "react-hook-form";
 import z from "zod";
-import type { CreateSessionDto } from "../../../api/sessions/sessions.types";
-import { sessionsApi } from "../../../api/sessions/sessions.api";
 
 export const Route = createFileRoute("/_authenticated/session/create")({
     component: RouteComponent,
@@ -23,10 +32,13 @@ function RouteComponent() {
 
     const {
         handleSubmit,
-        register,
-        formState: { errors, isSubmitting },
+        control,
+        formState: { isSubmitting },
     } = useForm<FormData>({
         resolver: zodResolver(schema),
+        defaultValues: {
+            name: "",
+        },
     });
 
     const handleCreateSession = handleSubmit(async (data: FormData) => {
@@ -41,37 +53,44 @@ function RouteComponent() {
     return (
         <section className="flex h-full w-full flex-col items-center justify-center gap-4">
             <h1>Create Session</h1>
-            <form
-                onSubmit={handleCreateSession}
-                className="flex flex-col gap-2"
-            >
-                <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="name">Name</label>
-                    <input
-                        {...register("name")}
-                        id="name"
-                        type="text"
-                        className="rounded border p-1"
-                    />
-                </div>
-                {errors.name && (
-                    <p className="text-sm text-red-500">
-                        {errors.name.message}
-                    </p>
-                )}
-                <div className="flex flex-col items-center justify-center gap-2">
-                    <button
-                        type="submit"
-                        className="cursor-pointer rounded border px-4 py-1"
-                        disabled={isSubmitting}
-                    >
+            <Form onSubmit={handleCreateSession}>
+                <Controller
+                    control={control}
+                    name="name"
+                    render={({
+                        field: { ref, name, value, onBlur, onChange },
+                        fieldState: { invalid, isTouched, isDirty, error },
+                    }) => (
+                        <Field
+                            name={name}
+                            invalid={invalid}
+                            touched={isTouched}
+                            dirty={isDirty}
+                        >
+                            <FieldLabel>Name</FieldLabel>
+                            <FieldControl
+                                ref={ref}
+                                value={value}
+                                onBlur={onBlur}
+                                onValueChange={onChange}
+                                type="text"
+                                placeholder="Name"
+                            />
+                            <FieldError match={!!error}>
+                                {error?.message}
+                            </FieldError>
+                        </Field>
+                    )}
+                />
+                <div className="mt-4 flex flex-col justify-center gap-2">
+                    <Button type="submit" loading={isSubmitting}>
                         Create Session
-                    </button>
-                    <Link to="/" className="cursor-pointer text-sm">
+                    </Button>
+                    <NavLink to="/session" size="sm">
                         Cancel
-                    </Link>
+                    </NavLink>
                 </div>
-            </form>
+            </Form>
         </section>
     );
 }

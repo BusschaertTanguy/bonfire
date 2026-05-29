@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { sessionsApi } from "../../../api/sessions/sessions.api";
-import type { SessionDto } from "../../../api/sessions/sessions.types";
+import { sessionsApi } from "@/api/sessions/sessions.api";
+import type { SessionDto } from "@/api/sessions/sessions.types";
 
 export const Route = createFileRoute("/_authenticated/session/$id")({
     component: RouteComponent,

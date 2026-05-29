@@ -1,5 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAuth } from "../hooks/use-auth";
+import Button from "@/components/ui/button";
+import NavLink from "@/components/ui/nav-link";
+import { useAuth } from "@/hooks/use-auth";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
     component: IndexComponent,
@@ -10,22 +12,14 @@ function IndexComponent() {
 
     return (
         <section className="flex h-full w-full flex-col items-center justify-center gap-4">
-            <button className="cursor-pointer">Join session</button>
+            <Button variant="nav">Join session</Button>
             {!user && (
                 <>
-                    <Link to="/login" className="cursor-pointer">
-                        Login
-                    </Link>
-                    <Link to="/register" className="cursor-pointer">
-                        Register
-                    </Link>
+                    <NavLink to="/login">Login</NavLink>
+                    <NavLink to="/register">Register</NavLink>
                 </>
             )}
-            {!!user && (
-                <>
-                    <Link to="/session">My sessions</Link>
-                </>
-            )}
+            {!!user && <NavLink to="/session">My sessions</NavLink>}
         </section>
     );
 }

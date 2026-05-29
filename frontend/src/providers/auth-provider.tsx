@@ -5,9 +5,9 @@ import {
     useState,
     type PropsWithChildren,
 } from "react";
-import { authApi } from "../api/auth/auth.api";
-import type { User } from "../api/auth/auth.types";
-import { AuthContext } from "../contexts/auth-context";
+import { authApi } from "@/api/auth/auth.api";
+import type { User } from "@/api/auth/auth.types";
+import { AuthContext } from "@/contexts/auth-context";
 
 export const AuthProvider = (props: PropsWithChildren) => {
     const [user, setUser] = useState<User | null>(null);

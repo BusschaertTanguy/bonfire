@@ -1,5 +1,5 @@
-import apiClient from "../api-client";
-import type { LoginRequest, RegisterRequest, User } from "./auth.types";
+import apiClient from "@/api/api-client";
+import type { User, RegisterRequest, LoginRequest } from "./auth.types";
 
 const url = "/api/v1/auth";
 

@@ -1,5 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { sessionsApi } from "../../../api/sessions/sessions.api";
+import { sessionsApi } from "@/api/sessions/sessions.api";
+import NavLink from "@/components/ui/nav-link";
+import Table from "@/components/ui/table";
+import { createFileRoute } from "@tanstack/react-router";
+import { CirclePlus, Eye } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/session/")({
     component: RouteComponent,
@@ -13,32 +16,33 @@ function RouteComponent() {
     const sessions = Route.useLoaderData();
 
     return (
-        <table className="table-auto border-collapse border">
-            <thead>
-                <tr>
-                    <th className="w-20 border p-2">
-                        <Link to="/session/create">New</Link>
-                    </th>
-                    <th className="border p-2">Code</th>
-                    <th className="border p-2">Name</th>
-                </tr>
-            </thead>
-            <tbody>
+        <Table.Root>
+            <Table.Head>
+                <Table.HeadCell className="w-12 text-center">
+                    <NavLink to="/session/create" variant="icon">
+                        <CirclePlus />
+                    </NavLink>
+                </Table.HeadCell>
+                <Table.HeadCell>Code</Table.HeadCell>
+                <Table.HeadCell>Name</Table.HeadCell>
+            </Table.Head>
+            <Table.Body>
                 {sessions.map((session) => (
-                    <tr key={session.id}>
-                        <td className="border p-2 text-center">
-                            <Link
+                    <Table.Row key={session.id}>
+                        <Table.RowCell className="text-center">
+                            <NavLink
                                 to={"/session/$id"}
                                 params={{ id: session.id }}
+                                variant="icon"
                             >
-                                Detail
-                            </Link>
-                        </td>
-                        <td className="border p-2">{session.code}</td>
-                        <td className="border p-2">{session.name}</td>
-                    </tr>
+                                <Eye />
+                            </NavLink>
+                        </Table.RowCell>
+                        <Table.RowCell>{session.code}</Table.RowCell>
+                        <Table.RowCell>{session.name}</Table.RowCell>
+                    </Table.Row>
                 ))}
-            </tbody>
-        </table>
+            </Table.Body>
+        </Table.Root>
     );
 }
