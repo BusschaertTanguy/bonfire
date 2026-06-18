@@ -1,9 +1,14 @@
+using System.Text.Json.Serialization;
 using Application.Extensions;
+using Domain.Users.Entities;
 using Infrastructure.Data;
 using Infrastructure.Extensions;
-using Infrastructure.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Presentation.AuthorizationHandlers;
+using Presentation.Constants;
 using Presentation.Filters;
+using Presentation.Hubs;
 using Presentation.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +21,13 @@ builder.Services
 builder.Services.AddProblemDetails();
 builder.Services.AddValidation();
 
-builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.SessionOwner, policy => policy.AddRequirements(new SessionOwnerRequirement()));
+
+builder.Services.AddScoped<IAuthorizationHandler, SessionOwnerAuthorizationHandler>();
+
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddCookie(IdentityConstants.ApplicationScheme);
 
@@ -55,10 +66,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-builder.Services.AddAntiforgery(options =>
+builder.Services.AddAntiforgery(options => { options.HeaderName = "X-XSRF-TOKEN"; });
+
+builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.HeaderName = "X-XSRF-TOKEN";
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options => { options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
 if (builder.Environment.IsDevelopment())
 {
@@ -87,6 +103,9 @@ app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<JoinHub>("/join")
+    .RequireAuthorization();
 
 var api = app.MapGroup("api")
     .AddEndpointFilter<AntiforgeryEndpointFilter>()

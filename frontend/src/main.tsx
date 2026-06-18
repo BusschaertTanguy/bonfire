@@ -1,9 +1,18 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import { authApi } from "@/api/auth/auth.api.ts";
 import App from "@/App.tsx";
 import "@/index.css";
 import { AuthProvider } from "@/providers/auth-provider.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+        },
+    },
+});
 
 async function bootstrap() {
     await authApi.antiforgery();
@@ -16,9 +25,11 @@ async function bootstrap() {
 
     createRoot(rootElement).render(
         <StrictMode>
-            <AuthProvider>
-                <App />
-            </AuthProvider>
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
+            </QueryClientProvider>
         </StrictMode>
     );
 }

@@ -2,14 +2,10 @@ import { authApi } from "@/api/auth/auth.api";
 import Button from "@/components/ui/button";
 import NavLink from "@/components/ui/nav-link";
 import { useAuth } from "@/hooks/use-auth";
-import {
-    createRootRouteWithContext,
-    Outlet,
-    useRouterState,
-} from "@tanstack/react-router";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { ChevronRight } from "lucide-react";
-import { useMemo } from "react";
+import Breadcrumbs from "./-components/breadcrumbs";
 
 export interface MyRouterContext {
     readonly authenticated: boolean;
@@ -20,30 +16,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootComponent() {
-    const { user, clearUser } = useAuth();
-    const navigate = Route.useNavigate();
-
-    const matches = useRouterState({ select: (s) => s.matches });
-
-    const crumbs = useMemo(
-        () =>
-            matches
-                .filter((match) => match.staticData.breadcrumb)
-                .map((match) => {
-                    const label =
-                        typeof match.staticData.breadcrumb === "function"
-                            ? match.staticData.breadcrumb(match.loaderData)
-                            : match.staticData.breadcrumb;
-
-                    return { label, path: match.pathname };
-                }),
-        [matches]
-    );
+    const { user, clearSession } = useAuth();
 
     const handleLogout = async () => {
         await authApi.logout();
-        clearUser();
-        await navigate({ to: "/" });
+        await clearSession();
     };
 
     return (
@@ -63,27 +40,12 @@ function RootComponent() {
                     )}
                 </header>
                 <main className="flex h-full w-full flex-col gap-4 p-4">
-                    <nav className="flex items-center gap-2">
-                        {crumbs.map((crumb, i) => (
-                            <span
-                                key={crumb.path}
-                                className="flex items-center gap-2"
-                            >
-                                <span key={crumb.path}>
-                                    <NavLink to={crumb.path} size="sm">
-                                        {crumb.label}
-                                    </NavLink>
-                                </span>
-                                {i < crumbs.length - 1 && (
-                                    <ChevronRight className="size-3.5" />
-                                )}
-                            </span>
-                        ))}
-                    </nav>
+                    <Breadcrumbs />
                     <Outlet />
                 </main>
             </div>
             <TanStackRouterDevtools />
+            <ReactQueryDevtools initialIsOpen={false} />
         </>
     );
 }

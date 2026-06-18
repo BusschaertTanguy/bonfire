@@ -27,5 +27,10 @@ internal sealed class SessionConfiguration : IEntityTypeConfiguration<Session>
             .HasDatabaseName(SessionConstraints.UniqueOpenSessionCode)
             .IsUnique()
             .HasFilter("\"closed_on\" IS NULL");
+
+        builder.HasMany(s => s.JoinRequests)
+            .WithOne()
+            .HasForeignKey(jr => jr.SessionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -14,4 +14,20 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
+let onUnauthenticated: (() => void) | null = null;
+
+export const setOnUnauthenticated = (callback: (() => void) | null) => {
+    onUnauthenticated = callback;
+};
+
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error: Error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            onUnauthenticated?.();
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default apiClient;

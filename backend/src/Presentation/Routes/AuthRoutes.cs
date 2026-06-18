@@ -1,8 +1,9 @@
-﻿using Infrastructure.Identity;
+﻿using Domain.Users.Entities;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.DTO;
+using Presentation.Extensions;
 
 namespace Presentation.Routes;
 
@@ -15,14 +16,14 @@ internal static class AuthRoutes
         group.MapGet("me",
             async (HttpContext http, [FromServices] UserManager<AppUser> userManager) =>
             {
-                var name = http.User.Identity?.Name;
+                var id = http.User.GetUserId();
 
-                if (string.IsNullOrEmpty(name))
+                if (!id.HasValue)
                 {
                     return Results.Unauthorized();
                 }
 
-                var user = await userManager.FindByNameAsync(name);
+                var user = await userManager.FindByIdAsync(id.Value.ToString());
 
                 return user == null
                     ? Results.Unauthorized()

@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 import type { ComponentProps } from "react";
 
-type TableRootProps = ComponentProps<"table">;
+type TableProps = ComponentProps<"table">;
 
-const Root = ({ children, className, ...props }: TableRootProps) => {
+const Table = ({ children, className, ...props }: TableProps) => {
     return (
         <table
             {...props}
@@ -19,7 +19,7 @@ const Root = ({ children, className, ...props }: TableRootProps) => {
 
 type TableHeadProps = ComponentProps<"thead">;
 
-const Head = ({ children, className, ...props }: TableHeadProps) => {
+const TableHead = ({ children, className, ...props }: TableHeadProps) => {
     return (
         <thead {...props} className={cn("", className)}>
             <tr>{children}</tr>
@@ -29,7 +29,11 @@ const Head = ({ children, className, ...props }: TableHeadProps) => {
 
 type TableHeadCellProps = ComponentProps<"th">;
 
-const HeadCell = ({ children, className, ...props }: TableHeadCellProps) => {
+const TableHeadCell = ({
+    children,
+    className,
+    ...props
+}: TableHeadCellProps) => {
     return (
         <th
             {...props}
@@ -45,7 +49,7 @@ const HeadCell = ({ children, className, ...props }: TableHeadCellProps) => {
 
 type TableBodyProps = ComponentProps<"tbody">;
 
-const Body = ({ children, className, ...props }: TableBodyProps) => {
+const TableBody = ({ children, className, ...props }: TableBodyProps) => {
     return (
         <tbody {...props} className={cn("", className)}>
             {children}
@@ -55,7 +59,7 @@ const Body = ({ children, className, ...props }: TableBodyProps) => {
 
 type TableRowProps = ComponentProps<"tr">;
 
-const Row = ({ children, className, ...props }: TableRowProps) => {
+const TableRow = ({ children, className, ...props }: TableRowProps) => {
     return (
         <tr {...props} className={cn("", className)}>
             {children}
@@ -65,7 +69,7 @@ const Row = ({ children, className, ...props }: TableRowProps) => {
 
 type TableRowCellProps = ComponentProps<"td">;
 
-const RowCell = ({ children, className, ...props }: TableRowCellProps) => {
+const TableRowCell = ({ children, className, ...props }: TableRowCellProps) => {
     return (
         <td
             {...props}
@@ -76,6 +80,4 @@ const RowCell = ({ children, className, ...props }: TableRowCellProps) => {
     );
 };
 
-const Table = { Root, Head, HeadCell, Body, Row, RowCell };
-
-export default Table;
+export { Table, TableHead, TableHeadCell, TableBody, TableRow, TableRowCell };

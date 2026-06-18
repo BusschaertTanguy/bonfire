@@ -1,6 +1,13 @@
 import { sessionsApi } from "@/api/sessions/sessions.api";
 import NavLink from "@/components/ui/nav-link";
-import Table from "@/components/ui/table";
+import {
+    TableBody,
+    TableHead,
+    TableHeadCell,
+    Table,
+    TableRow,
+    TableRowCell,
+} from "@/components/ui/table";
 import { createFileRoute } from "@tanstack/react-router";
 import { CirclePlus, Eye } from "lucide-react";
 
@@ -16,20 +23,20 @@ function RouteComponent() {
     const sessions = Route.useLoaderData();
 
     return (
-        <Table.Root>
-            <Table.Head>
-                <Table.HeadCell className="w-12 text-center">
+        <Table>
+            <TableHead>
+                <TableHeadCell className="w-12 text-center">
                     <NavLink to="/session/create" variant="icon">
                         <CirclePlus />
                     </NavLink>
-                </Table.HeadCell>
-                <Table.HeadCell>Code</Table.HeadCell>
-                <Table.HeadCell>Name</Table.HeadCell>
-            </Table.Head>
-            <Table.Body>
+                </TableHeadCell>
+                <TableHeadCell>Code</TableHeadCell>
+                <TableHeadCell>Name</TableHeadCell>
+            </TableHead>
+            <TableBody>
                 {sessions.map((session) => (
-                    <Table.Row key={session.id}>
-                        <Table.RowCell className="text-center">
+                    <TableRow key={session.id}>
+                        <TableRowCell className="text-center">
                             <NavLink
                                 to={"/session/$id"}
                                 params={{ id: session.id }}
@@ -37,12 +44,12 @@ function RouteComponent() {
                             >
                                 <Eye />
                             </NavLink>
-                        </Table.RowCell>
-                        <Table.RowCell>{session.code}</Table.RowCell>
-                        <Table.RowCell>{session.name}</Table.RowCell>
-                    </Table.Row>
+                        </TableRowCell>
+                        <TableRowCell>{session.code}</TableRowCell>
+                        <TableRowCell>{session.name}</TableRowCell>
+                    </TableRow>
                 ))}
-            </Table.Body>
-        </Table.Root>
+            </TableBody>
+        </Table>
     );
 }

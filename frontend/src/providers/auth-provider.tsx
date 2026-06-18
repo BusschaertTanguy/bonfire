@@ -1,45 +1,38 @@
-import {
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-    type PropsWithChildren,
-} from "react";
-import { authApi } from "@/api/auth/auth.api";
-import type { User } from "@/api/auth/auth.types";
+import { setOnUnauthenticated } from "@/api/api-client";
+import { meOptions } from "@/api/auth/auth.queries";
 import { AuthContext } from "@/contexts/auth-context";
+import { router } from "@/router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, type PropsWithChildren } from "react";
 
 export const AuthProvider = (props: PropsWithChildren) => {
-    const [user, setUser] = useState<User | null>(null);
+    const queryClient = useQueryClient();
+    const { data, refetch, isLoading } = useQuery(meOptions());
 
-    const clearUser = useCallback(() => {
-        setUser(null);
-    }, []);
-
-    const loadUser = useCallback(async () => {
-        try {
-            const userResponse = await authApi.me();
-            setUser(userResponse.data);
-        } catch {
-            setUser(null);
-        }
-    }, []);
+    const clearSession = useCallback(async () => {
+        queryClient.setQueryData(meOptions().queryKey, null);
+        await router.navigate({ to: "/" });
+    }, [queryClient]);
 
     const value = useMemo(() => {
         return {
-            user,
-            loadUser,
-            clearUser,
+            user: data ?? null,
+            loadUser: async () => {
+                await refetch();
+            },
+            clearSession,
+            isLoading,
         };
-    }, [user, loadUser, clearUser]);
+    }, [data, refetch, clearSession, isLoading]);
 
     useEffect(() => {
-        const authenticate = async () => {
-            await loadUser();
+        setOnUnauthenticated(async () => {
+            await clearSession();
+        });
+        return () => {
+            setOnUnauthenticated(null);
         };
-
-        void authenticate();
-    }, [loadUser]);
+    }, [clearSession]);
 
     return (
         <AuthContext.Provider value={value}>
