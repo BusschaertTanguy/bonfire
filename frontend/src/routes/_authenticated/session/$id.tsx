@@ -1,5 +1,7 @@
-import { getJoinRequestsOptions } from "@/api/sessions/sessions.queries";
-import { sessionsApi } from "@/api/sessions/sessions.api";
+import {
+    getJoinRequestsOptions,
+    getSessionOptions,
+} from "@/api/sessions/sessions.queries";
 import {
     JoinRequestStatus,
     type SessionDto,
@@ -15,15 +17,30 @@ import {
 } from "@/components/ui/table";
 import useJoinHub from "@/hooks/use-join-hub";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/session/$id")({
     component: RouteComponent,
-    loader: async ({ params }) => {
-        const response = await sessionsApi.get(params.id);
-        return response.data;
+    beforeLoad: async ({ params, context }) => {
+        const data = await context.queryClient.ensureQueryData(
+            getSessionOptions(params.id)
+        );
+
+        if (data.ownerId !== context.userId) {
+            // TODO: When the play page is available, first redirect the user there.
+            throw redirect({
+                to: "/session",
+            });
+        }
+    },
+    loader: async ({ params, context }) => {
+        const data = await context.queryClient.ensureQueryData(
+            getSessionOptions(params.id)
+        );
+
+        return data;
     },
     staticData: {
         breadcrumb: (data) => {

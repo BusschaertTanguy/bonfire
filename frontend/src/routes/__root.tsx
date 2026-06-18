@@ -6,9 +6,12 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import Breadcrumbs from "./-components/breadcrumbs";
+import type { QueryClient } from "@tanstack/react-query";
 
 export interface MyRouterContext {
+    readonly userId: string | null;
     readonly authenticated: boolean;
+    readonly queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
