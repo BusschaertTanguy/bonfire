@@ -1,22 +1,22 @@
 using System.Text.Json.Serialization;
-using Application.Extensions;
+using Application.Common.Extensions;
 using Domain.Users.Entities;
-using Infrastructure.Data;
-using Infrastructure.Extensions;
+using Infrastructure.Common.Data;
+using Infrastructure.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Presentation.AuthorizationHandlers;
-using Presentation.Constants;
-using Presentation.Filters;
-using Presentation.Hubs;
-using Presentation.Routes;
+using Presentation.Auth.AuthorizationHandlers;
+using Presentation.Auth.Constants;
+using Presentation.Auth.Filters;
+using Presentation.Auth.Routes;
+using Presentation.Sessions.Hubs;
+using Presentation.Sessions.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services
-    .AddApplicationLayer()
-    .AddInfrastructureLayer(builder.Configuration);
+builder.Services.AddInfrastructureLayer(builder.Configuration)
+    .AddApplicationLayer();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddValidation();

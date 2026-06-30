@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
-using Application.Data;
-using Application.Requests;
+using Application.Common.Data;
+using Application.Common.Requests;
 using Application.Sessions.Constants;
 using Domain.Sessions.Entities;
 using Microsoft.EntityFrameworkCore;

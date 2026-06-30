@@ -1,4 +1,4 @@
-﻿using Application.Requests;
+﻿using Application.Common.Requests;
 using Domain.Sessions.Enums;
 
 namespace Application.Sessions.Commands.ChangeJoinRequestStatus;

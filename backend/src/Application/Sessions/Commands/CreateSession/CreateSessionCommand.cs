@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using Application.Requests;
+using Application.Common.Requests;
 
 namespace Application.Sessions.Commands.CreateSession;
 

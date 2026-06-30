@@ -1,4 +1,4 @@
-﻿using Application.Requests;
+﻿using Application.Common.Requests;
 
 namespace Application.Sessions.Commands.AddJoinRequest;
 
