@@ -1,5 +1,8 @@
-﻿using Application.Sessions.DTO;
-using Application.Sessions.Services;
+﻿using Application.Requests;
+using Application.Sessions.Commands.CreateSession;
+using Application.Sessions.Queries.GetAllJoinRequests;
+using Application.Sessions.Queries.GetAllSessions;
+using Application.Sessions.Queries.GetSession;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Constants;
@@ -15,7 +18,7 @@ internal static class SessionRoutes
 
         group.MapGet("", async (
             HttpContext httpContext,
-            [FromServices] ISessionService service,
+            [FromServices] IRequestDispatcher dispatcher,
             CancellationToken cancellationToken) =>
         {
             var userId = httpContext.User.GetUserId();
@@ -24,14 +27,15 @@ internal static class SessionRoutes
                 return Results.Unauthorized();
             }
 
-            var sessions = await service.GetAllAsync(userId.Value, cancellationToken);
+            var query = new GetAllSessionsQuery(userId.Value);
+            var sessions = await dispatcher.DispatchAsync(query, cancellationToken);
             return Results.Ok(sessions);
         });
 
         group.MapGet("{id:guid}", async (
             HttpContext httpContext,
             [FromServices] IAuthorizationService authorizationService,
-            [FromServices] ISessionService service,
+            [FromServices] IRequestDispatcher dispatcher,
             Guid id,
             CancellationToken cancellationToken) =>
         {
@@ -41,14 +45,15 @@ internal static class SessionRoutes
                 return Results.Forbid();
             }
 
-            var sessions = await service.GetAsync(id, cancellationToken);
+            var query = new GetSessionQuery(id);
+            var sessions = await dispatcher.DispatchAsync(query, cancellationToken);
             return Results.Ok(sessions);
         });
 
         group.MapGet("{id:guid}/join-requests", async (
             HttpContext httpContext,
             [FromServices] IAuthorizationService authorizationService,
-            [FromServices] ISessionService service,
+            [FromServices] IRequestDispatcher dispatcher,
             Guid id,
             CancellationToken cancellationToken) =>
         {
@@ -58,14 +63,16 @@ internal static class SessionRoutes
                 return Results.Forbid();
             }
 
-            var sessions = await service.GetAllJoinRequestsAsync(id, cancellationToken);
+            var query = new GetAllJoinRequestsQuery(id);
+            var sessions = await dispatcher.DispatchAsync(query, cancellationToken);
+
             return Results.Ok(sessions);
         });
 
         group.MapPost("", async (
             HttpContext httpContext,
-            [FromServices] ISessionService service,
-            [FromBody] CreateSessionDto dto,
+            [FromServices] IRequestDispatcher dispatcher,
+            [FromBody] CreateSessionCommand command,
             CancellationToken cancellationToken) =>
         {
             var userId = httpContext.User.GetUserId();
@@ -74,12 +81,12 @@ internal static class SessionRoutes
                 return Results.Unauthorized();
             }
 
-            dto = dto with
+            command = command with
             {
                 OwnerId = userId.Value
             };
 
-            var id = await service.CreateAsync(dto, cancellationToken);
+            var id = await dispatcher.DispatchAsync(command, cancellationToken);
             return Results.Created($"/sessions/{id}", id);
         });
     }
