@@ -30,14 +30,28 @@ internal sealed class JoinHub(ISessionService sessionService, IAuthorizationServ
         var joinGroup = $"session/{session.Id}/join/{userId}";
         await Groups.AddToGroupAsync(Context.ConnectionId, joinGroup);
 
-        var ownerGroup = $"session/{session.Id}";
-        await Clients.Group(ownerGroup).SendAsync("JoinRequestAdded");
+        var sessionGroup = $"session/{session.Id}";
+        await Clients.Group(sessionGroup).SendAsync("JoinRequestAdded");
     }
 
-    public async Task JoinSessionOwnerGroup(string sessionId)
+    public async Task JoinSession(Guid sessionId)
     {
-        var ownerGroup = $"session/{sessionId}";
-        await Groups.AddToGroupAsync(Context.ConnectionId, ownerGroup);
+        var user = Context.User;
+        if (user is null)
+        {
+            throw new InvalidOperationException("Unauthorized");
+        }
+
+        var authorizationResult =
+            await authorizationService.AuthorizeAsync(user, sessionId, Policies.SessionParticipant);
+        
+        if (!authorizationResult.Succeeded)
+        {
+            throw new InvalidOperationException("Forbidden");
+        }
+
+        var sessionGroup = $"session/{sessionId}";
+        await Groups.AddToGroupAsync(Context.ConnectionId, sessionGroup);
     }
 
     public async Task ChangeJoinRequestStatus(Guid sessionId, Guid userId, JoinRequestStatus status)
@@ -60,7 +74,7 @@ internal sealed class JoinHub(ISessionService sessionService, IAuthorizationServ
         var joinGroup = $"session/{sessionId}/join/{userId}";
         await Clients.Group(joinGroup).SendAsync("JoinRequestStatusChanged", sessionId, userId, status);
 
-        var ownerGroup = $"session/{sessionId}";
-        await Clients.Group(ownerGroup).SendAsync("JoinRequestStatusChanged", sessionId, userId, status);
+        var sessionGroup = $"session/{sessionId}";
+        await Clients.Group(sessionGroup).SendAsync("JoinRequestStatusChanged", sessionId, userId, status);
     }
 }

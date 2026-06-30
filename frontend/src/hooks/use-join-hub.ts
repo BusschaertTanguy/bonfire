@@ -29,8 +29,8 @@ const useJoinHub = (options: UseJoinHubOptions) => {
         await connection?.send("AddJoinRequest", code);
     };
 
-    const joinSessionOwnerGroup = async (id: string) => {
-        await connection?.send("JoinSessionOwnerGroup", id);
+    const joinSession = async (id: string) => {
+        await connection?.send("JoinSession", id);
     };
 
     const changeJoinRequestStatus = async (
@@ -48,7 +48,7 @@ const useJoinHub = (options: UseJoinHubOptions) => {
 
     return {
         addJoinRequest,
-        joinSessionOwnerGroup,
+        joinSession,
         changeJoinRequestStatus,
     };
 };

@@ -68,7 +68,7 @@ function RouteComponent() {
     const isOwner = user?.id === session.ownerId;
 
     const joinHub = useJoinHub({
-        enabled: !!user,
+        enabled: true,
         onJoinRequestAdded: async () => {
             await joinRequestsQuery.refetch();
         },
@@ -82,7 +82,7 @@ function RouteComponent() {
     };
 
     useEffect(() => {
-        joinHub.joinSessionOwnerGroup(session.id).then().catch(console.error);
+        joinHub.joinSession(session.id).then().catch(console.error);
     }, [joinHub, session.id]);
 
     return (
