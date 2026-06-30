@@ -27,11 +27,11 @@ internal sealed class JoinHub(ISessionService sessionService, IAuthorizationServ
         var dto = new AddJoinRequestDto(userId.Value);
         await sessionService.AddJoinRequestAsync(session.Id, dto);
 
-        var joinGroup = $"session/{session.Id}/join/{userId}";
+        var joinGroup = GetJoinGroup(session.Id, userId.Value);
         await Groups.AddToGroupAsync(Context.ConnectionId, joinGroup);
 
-        var sessionGroup = $"session/{session.Id}";
-        await Clients.Group(sessionGroup).SendAsync("JoinRequestAdded");
+        var sessionGroup = GetSessionGroup(session.Id);
+        await Clients.Group(sessionGroup).SendAsync(JoinHubMessages.JoinRequestAdded);
     }
 
     public async Task JoinSession(Guid sessionId)
@@ -50,7 +50,7 @@ internal sealed class JoinHub(ISessionService sessionService, IAuthorizationServ
             throw new InvalidOperationException("Forbidden");
         }
 
-        var sessionGroup = $"session/{sessionId}";
+        var sessionGroup = GetSessionGroup(sessionId);
         await Groups.AddToGroupAsync(Context.ConnectionId, sessionGroup);
     }
 
@@ -71,10 +71,20 @@ internal sealed class JoinHub(ISessionService sessionService, IAuthorizationServ
         var dto = new ChangeJoinRequestStatusDto(userId, status);
         await sessionService.ChangeJoinRequestStatus(sessionId, dto);
 
-        var joinGroup = $"session/{sessionId}/join/{userId}";
-        await Clients.Group(joinGroup).SendAsync("JoinRequestStatusChanged", sessionId, userId, status);
+        var joinGroup = GetJoinGroup(sessionId, userId);
+        await Clients.Group(joinGroup).SendAsync(JoinHubMessages.JoinRequestStatusChanged, sessionId, userId, status);
 
-        var sessionGroup = $"session/{sessionId}";
-        await Clients.Group(sessionGroup).SendAsync("JoinRequestStatusChanged", sessionId, userId, status);
+        var sessionGroup = GetSessionGroup(sessionId);
+        await Clients.Group(sessionGroup).SendAsync(JoinHubMessages.JoinRequestAdded, sessionId, userId, status);
+    }
+
+    private static string GetJoinGroup(Guid sessionId, Guid userId)
+    {
+        return $"session/{sessionId}/join/{userId}";
+    }
+    
+    private static string GetSessionGroup(Guid sessionId)
+    {
+        return $"session/{sessionId}";
     }
 }
