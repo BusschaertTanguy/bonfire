@@ -1,3 +1,4 @@
+import { JoinRequestStatus } from "@/api/sessions/sessions.types";
 import Button from "@/components/ui/button";
 import {
     Dialog,
@@ -16,6 +17,7 @@ import {
 import Form from "@/components/ui/form";
 import useJoinHub from "@/hooks/use-join-hub";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
@@ -33,6 +35,7 @@ interface JoinSessionProps {
 }
 
 const JoinSession = ({ onClose }: JoinSessionProps) => {
+    const router = useRouter();
     const [joinPending, setJoinPending] = useState(false);
 
     const { handleSubmit, control } = useForm<FormData>({
@@ -43,10 +46,17 @@ const JoinSession = ({ onClose }: JoinSessionProps) => {
     });
 
     const joinHub = useJoinHub({
-        onJoinRequestStatusChanged: async () => {
-            // TODO: Join requested session
-
-            await onClose();
+        enabled: true,
+        onJoinRequestStatusChanged: async (
+            sessionId: string,
+            _: string,
+            status: JoinRequestStatus
+        ) => {
+            if (status === JoinRequestStatus.Approved) {
+                await router.navigate({ to: `/session/${sessionId}` });
+            } else {
+                await onClose();
+            }
         },
     });
 

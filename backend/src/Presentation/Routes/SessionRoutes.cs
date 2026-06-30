@@ -35,7 +35,7 @@ internal static class SessionRoutes
             Guid id,
             CancellationToken cancellationToken) =>
         {
-            var result = await authorizationService.AuthorizeAsync(httpContext.User, id, Policies.SessionOwner);
+            var result = await authorizationService.AuthorizeAsync(httpContext.User, id, Policies.SessionParticipant);
             if (!result.Succeeded)
             {
                 return Results.Forbid();
@@ -52,7 +52,7 @@ internal static class SessionRoutes
             Guid id,
             CancellationToken cancellationToken) =>
         {
-            var result = await authorizationService.AuthorizeAsync(httpContext.User, id, Policies.SessionOwner);
+            var result = await authorizationService.AuthorizeAsync(httpContext.User, id, Policies.SessionParticipant);
             if (!result.Succeeded)
             {
                 return Results.Forbid();

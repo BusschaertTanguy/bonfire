@@ -24,9 +24,11 @@ builder.Services.AddValidation();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy(Policies.SessionOwner, policy => policy.AddRequirements(new SessionOwnerRequirement()));
+    .AddPolicy(Policies.SessionOwner, policy => policy.AddRequirements(new SessionOwnerRequirement()))
+    .AddPolicy(Policies.SessionParticipant, policy => policy.AddRequirements(new SessionParticipantRequirement()));
 
 builder.Services.AddScoped<IAuthorizationHandler, SessionOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, SessionParticipantAuthorizationHandler>();
 
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddCookie(IdentityConstants.ApplicationScheme);

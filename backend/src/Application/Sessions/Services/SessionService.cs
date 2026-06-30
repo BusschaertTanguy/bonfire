@@ -2,6 +2,7 @@
 using Application.Sessions.Constants;
 using Application.Sessions.DTO;
 using Domain.Sessions.Entities;
+using Domain.Sessions.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Sessions.Services;
@@ -13,7 +14,8 @@ internal sealed class SessionService(
     public async Task<List<SessionDto>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await dbContext.Set<Session>()
-            .Where(s => s.OwnerId == userId)
+            .Where(s => s.OwnerId == userId ||
+                        s.JoinRequests.Any(jr => jr.UserId == userId && jr.Status == JoinRequestStatus.Approved))
             .Select(s => new SessionDto(s.Id, s.OwnerId, s.Code, s.Name))
             .ToListAsync(cancellationToken);
     }

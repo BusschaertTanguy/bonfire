@@ -2,6 +2,7 @@ import type { JoinRequestStatus } from "@/api/sessions/sessions.types";
 import useSignalR from "./use-signalr";
 
 interface UseJoinHubOptions {
+    enabled: boolean;
     onJoinRequestAdded?: () => void | Promise<void>;
     onJoinRequestStatusChanged?: (
         sessionId: string,
@@ -11,7 +12,7 @@ interface UseJoinHubOptions {
 }
 
 const useJoinHub = (options: UseJoinHubOptions) => {
-    const connection = useSignalR("/join", (c) => {
+    const connection = useSignalR(options.enabled ? "/join" : null, (c) => {
         if (options.onJoinRequestAdded) {
             c.on("JoinRequestAdded", options.onJoinRequestAdded);
         }

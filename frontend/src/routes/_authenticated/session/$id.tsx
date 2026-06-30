@@ -15,8 +15,9 @@ import {
     TableRow,
     TableRowCell,
 } from "@/components/ui/table";
+import { useAuth } from "@/hooks/use-auth";
 import useJoinHub from "@/hooks/use-join-hub";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { useEffect } from "react";
@@ -24,12 +25,18 @@ import { useEffect } from "react";
 export const Route = createFileRoute("/_authenticated/session/$id")({
     component: RouteComponent,
     beforeLoad: async ({ params, context }) => {
-        const data = await context.queryClient.ensureQueryData(
+        const sessionData = await context.queryClient.ensureQueryData(
             getSessionOptions(params.id)
         );
 
-        if (data.ownerId !== context.userId) {
-            // TODO: When the play page is available, first redirect the user there.
+        const joinRequestsData = await context.queryClient.ensureQueryData(
+            getJoinRequestsOptions(params.id)
+        );
+
+        if (
+            sessionData.ownerId !== context.userId &&
+            !joinRequestsData.some((jr) => jr.userId === context.userId)
+        ) {
             throw redirect({
                 to: "/session",
             });
@@ -51,10 +58,17 @@ export const Route = createFileRoute("/_authenticated/session/$id")({
 });
 
 function RouteComponent() {
+    const { user } = useAuth();
     const session = Route.useLoaderData();
-    const joinRequestsQuery = useQuery(getJoinRequestsOptions(session.id));
+
+    const joinRequestsQuery = useSuspenseQuery(
+        getJoinRequestsOptions(session.id)
+    );
+
+    const isOwner = user?.id === session.ownerId;
 
     const joinHub = useJoinHub({
+        enabled: !!user,
         onJoinRequestAdded: async () => {
             await joinRequestsQuery.refetch();
         },
@@ -82,12 +96,17 @@ function RouteComponent() {
                     <TableHeadCell className="w-12"></TableHeadCell>
                 </TableHead>
                 <TableBody>
-                    {joinRequestsQuery.data?.map((joinRequest) => (
+                    {joinRequestsQuery.data.map((joinRequest) => (
                         <TableRow key={joinRequest.userId}>
                             <TableRowCell>{joinRequest.name}</TableRowCell>
                             <TableRowCell>{joinRequest.status}</TableRowCell>
                             <TableRowCell className="text-center">
                                 <Button
+                                    disabled={
+                                        !isOwner ||
+                                        joinRequest.status !==
+                                            JoinRequestStatus.Pending
+                                    }
                                     variant="icon"
                                     size="sm"
                                     onClick={() =>

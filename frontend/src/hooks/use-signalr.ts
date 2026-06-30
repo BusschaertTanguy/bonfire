@@ -2,7 +2,7 @@ import { HubConnectionBuilder, type HubConnection } from "@microsoft/signalr";
 import { useEffect, useRef, useState } from "react";
 
 const useSignalR = (
-    url: string,
+    url: string | null,
     configureMessages?: (connection: HubConnection) => void
 ) => {
     const [connection, setConnection] = useState<HubConnection | null>(null);
@@ -14,6 +14,10 @@ const useSignalR = (
 
     useEffect(() => {
         let cancelled = false;
+
+        if (!url) {
+            return;
+        }
 
         const newConnection = new HubConnectionBuilder()
             .withUrl(url)
